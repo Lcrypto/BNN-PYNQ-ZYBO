@@ -1,13 +1,13 @@
 # BNN-PYNQ forked repo for Zybo-Z7
 
-This is an extended version of BNN-PYNQ that includes an extra network topology targetted specially for the Zybo-Z7:
+This is an extended version of BNN-PYNQ that includes an extra network topology targetted specially for the Zybo-Z7-10:
 The topology, named SFC is described in the <a href="https://arxiv.org/abs/1612.07119" target="_blank"> FINN Paper </a>. 
 
 - 1 bit weight and 1 bit activation (W1A1) for SFC
 
-Addittionally, scripts to support synthesis on the Zybo-Z7 and a Google Collab training notebook are included.
+Addittionally, scripts to support synthesis on the Zybo-Z7-10 and a Google Collab training notebook are included.
 
-Please note that no other included topology is compatible with the Zybo-Z7.
+Please note that no other included topology is compatible with the Zybo-Z7-10.
 
 # BNN-PYNQ PIP INSTALL Package
 
@@ -41,11 +41,12 @@ Please refer to PYNQ <a href="https://pynq.readthedocs.io/en/latest/getting_star
 In order to install it to your PYNQ, connect to the board, open a terminal and type:
 
 ```
-sudo pip3 install git+https://github.com/Xilinx/BNN-PYNQ.git (on PYNQ v2.3 and later versions, tested up to v2.5)
-sudo pip3.6 install git+https://github.com/Xilinx/BNN-PYNQ.git (on PYNQ v2.2 and earlier)
+sudo pip3 install git+https://github.com/fcaspe/BNN-PYNQ-ZYBO.git (on PYNQ v2.3 and later versions, tested up to v2.5)
+sudo pip3.6 install git+https://github.com/fcaspe/BNN-PYNQ-ZYBO.git (on PYNQ v2.2 and earlier)
 ```
 
 This will install the BNN package to your board, and create a **bnn** directory in the Jupyter home area. You will find the Jupyter notebooks to test the networks in this directory.
+
 
 ## Repo organization 
 
@@ -59,14 +60,17 @@ The repo is organized as follows:
 	-	bitstreams: contains the bitstreams for the 5 overlays
 		- pynqZ1-Z2: bitstreams for Pynq devices
 		- ultra96: bitstreams for Ultra96 devices
+        - Zybo-Z7: bitstreams for Zybo-Z7-10 devices
 	-	libraries: pre-compiled shared objects for low-level driver of the 5 overlays each for hardware and software runtime
 		- pynqZ1-Z2: shared objects used by Pynq devices
 		- ultra96: shared objects used by ultra96
+        - Zybo-Z7: shared objects used by Zybo-Z7
 	-	params: set of trained parameters for the 5 overlays:
 		- <a href="http://yann.lecun.com/exdb/mnist/" target="_blank"> MNIST </a> and <a href="https://www.nist.gov/srd/nist-special-database-19" target="_blank"> NIST </a> dataset for LFC network. Note that NIST dataset is only applicable to LFC-W1A1 by default.
 		- <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank"> Cifar10 </a>, <a href="http://ufldl.stanford.edu/housenumbers/" target="_blank"> SVHN </a> and <a href="http://benchmark.ini.rub.de/?section=gtsdb&subsection=dataset" target="_blank"> German Road Signs </a> dataset for CNV network. Note that SVHN and German Road Signs databases are only applicable to CNV-W1A1 by default.
 -	notebooks: lists a set of python notebooks examples, that during installation will be moved in `/home/xilinx/jupyter_notebooks/bnn/` folder
 -	tests: contains test script and test images
+-	xtras: contains notebooks to train the SFC in Google Collab and and a simple utility to inspect theano-lasagne pickled weights.
 
 ## Hardware design rebuilt
 

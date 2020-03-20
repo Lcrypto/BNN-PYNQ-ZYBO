@@ -43,6 +43,7 @@
 
 NETWORKS=$(ls -d *W*A*/ | cut -f1 -d'/' | tr "\n" " ")
 
+
 if [ "$#" -ne 2 ]; then
   echo "Usage: $0 <network> <runtime> where ">&2
   echo "<network> = $NETWORKS" >&2
@@ -54,14 +55,14 @@ NETWORK=$1
 RUNTIME=$2
 
 if [ -z "$XILINX_BNN_ROOT" ]; then
-  echo "Need to set XILINX_BNN_ROOT"
-  exit 1
+    export XILINX_BNN_ROOT="$( ( cd "$(dirname "$0")/.."; pwd) )"
 fi
 
 if [ -z "$VIVADOHLS_INCLUDE_PATH" ]; then
   echo "Need to set VIVADOHLS_INCLUDE_PATH to rebuild from source"
   echo "The pre-compiled shared objects will be included"
-  exit 1
+  echo "Including Vivado 2018.3 Include files provided by BNN repo. . ."
+  VIVADOHLS_INCLUDE_PATH=${XILINX_BNN_ROOT}/library/hls_include/
 fi  
 
 OLD_DIR=$(pwd)
@@ -81,12 +82,15 @@ cd $OLD_DIR
 
 if [[ ("$BOARD" == "Pynq-Z1") || ("$BOARD" == "Pynq-Z2") ]]; then
   DEF_BOARD="PYNQ"
-  PLATFORM="pynqZ1-Z2"  
+  PLATFORM="pynqZ1-Z2"
 elif [[ ("$BOARD" == "Ultra96") ]]; then
   DEF_BOARD="ULTRA"
   PLATFORM="ultra96"
+elif [[ ("$BOARD" == "Zybo-Z7") ]]; then
+  DEF_BOARD="PYNQ"
+  PLATFORM="Zybo-Z7"
 else
-  echo "Error: BOARD variable has to be Ultra96, Pynq-Z1 and Pynq-Z2 Board."
+  echo "Error: BOARD variable has to be Ultra96, Pynq-Z1, Pynq-Z2 or Zybo-Z7 Board."
   exit 1
 fi
 

@@ -36,7 +36,7 @@ import os
 from glob import glob
 import site 
 
-if os.environ['BOARD'] != 'Ultra96' and os.environ['BOARD'] != 'Pynq-Z1' and os.environ['BOARD'] != 'Pynq-Z2':
+if os.environ['BOARD'] != 'Ultra96' and os.environ['BOARD'] != 'Pynq-Z1' and os.environ['BOARD'] != 'Pynq-Z2' and os.environ['BOARD'] != 'Zybo-Z7' :
 	print("Only supported on a Ultra96, Pynq-Z1 or Pynq-Z2 Board")
 	exit(1)
 

@@ -41,13 +41,14 @@
  #
  #
 ###############################################################################
+ # Modified by Franco Caspe to accept other boards.
 
 NETWORKS=$(ls -d *W*A*/ | cut -f1 -d'/' | tr "\n" " ")
 
 if [ "$#" -ne 3 ]; then
   echo "Usage: $0 <network> <platform> <mode>" >&2
   echo "where <network> = $NETWORKS" >&2
-  echo "<platform> = pynqZ1-Z2 ultra96" >&2
+  echo "<platform> = pynqZ1-Z2 ultra96 Zybo-Z7 Zedboard" >&2
   echo "<mode> = regenerate (h)ls only, (b)itstream only, (a)ll" >&2
   exit 1
 fi
@@ -127,9 +128,19 @@ if [[ ("$MODE" == "h") || ("$MODE" == "a")  ]]; then
 	PARAMS="$XILINX_BNN_ROOT/../params/mnist/$NETWORK"
 	TEST_INPUT="$XILINX_BNN_ROOT/../../tests/Test_image/3.image-idx3-ubyte"
 	TEST_RESULT=3
+  elif [[ ("$NETWORK" == "sfc"*) ]]; then
+	PARAMS="$XILINX_BNN_ROOT/../params/mnist/$NETWORK"
+	TEST_INPUT="$XILINX_BNN_ROOT/../../tests/Test_image/3.image-idx3-ubyte"
+	TEST_RESULT=3
   fi
   if [[ ("$PLATFORM" == "pynqZ1-Z2") ]]; then
     PLATFORM_PART="xc7z020clg400-1"
+    TARGET_CLOCK=5
+  elif [[ ("$PLATFORM" == "Zybo-Z7") ]]; then
+	PLATFORM_PART="xc7z010clg400-1"
+    TARGET_CLOCK=5
+  elif [[ ("$PLATFORM" == "Zedboard") ]]; then
+	PLATFORM_PART="xc7z020clg484-1"
     TARGET_CLOCK=5
   elif [[ ("$PLATFORM" == "ultra96") ]]; then
     PLATFORM_PART="xczu3eg-sbva484-1-i"

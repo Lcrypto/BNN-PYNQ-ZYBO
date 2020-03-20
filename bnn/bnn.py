@@ -42,9 +42,12 @@ NETWORK_CNVW1A2 = "cnvW1A2"
 NETWORK_CNVW2A2 = "cnvW2A2"
 NETWORK_LFCW1A1 = "lfcW1A1"
 NETWORK_LFCW1A2 = "lfcW1A2"
+NETWORK_SFCW1A1 = "sfcW1A1"
 
 if os.environ['BOARD'] == 'Ultra96':
 	PLATFORM="ultra96"
+elif os.environ['BOARD'] == 'Zybo-Z7' or os.environ['BOARD'] == 'Pynq-Zybo':
+	PLATFORM="Zybo-Z7"
 elif os.environ['BOARD'] == 'Pynq-Z1' or os.environ['BOARD'] == 'Pynq-Z2':
 	PLATFORM="pynqZ1-Z2"
 else:
@@ -71,6 +74,7 @@ _libraries = {}
 # function to check which datasets are available for a given network
 def available_params(network):
 	datasets = os.listdir(BNN_PARAM_DIR)
+	print("[DEBUG] Datasets: {}".format(datasets))
 	ret = []
 	for d in datasets:
 		if os.path.isdir(os.path.join(BNN_PARAM_DIR, d)):
@@ -78,6 +82,7 @@ def available_params(network):
 			for nets in supportedNets:
 				if nets == network:
 					ret.append(d)
+	print("[DEBUG] ret: {}".format(ret))
 	return ret
 
 # pyhton object as interface for communication with host library through C++ shared object library
@@ -86,6 +91,7 @@ class PynqBNN:
 	# on creating PynqBNN the shared library for a given network is loaded and bitstream is downloaded to PL
 	# when intending to use hardware accelerated runtime
 	def __init__(self, runtime, network, load_overlay=True):
+		print("[DEBUG] Initializing PynqBNN class . . . \n\truntime: %s\n\tnetwork: %s" % (runtime,network))
 		self.bitstream_name = None
 		if runtime == RUNTIME_HW:
 			self.bitstream_name="{0}-{1}.bit".format(network,PLATFORM)
@@ -95,11 +101,14 @@ class PynqBNN:
 					Overlay(self.bitstream_path).download()
 				else:
 					raise RuntimeError("Incorrect Overlay loaded")
+		print("[DEBUG] Overlay Loaded")
 		dllname = "{0}-{1}-{2}.so".format(runtime, network,PLATFORM)
 		if dllname not in _libraries:
+			print("[DEBUG] Loading %s . . . " % dllname)
 			_libraries[dllname] = _ffi.dlopen(os.path.join(BNN_LIB_DIR, dllname))
 		self.interface = _libraries[dllname]
 		self.num_classes = 0
+		print("[DEBUG] PynqBNN class initialized.")
 
 	def __del__(self):
 		self.interface.deinit()
@@ -109,6 +118,7 @@ class PynqBNN:
 		if not os.path.isabs(params):
 			params = os.path.join(BNN_PARAM_DIR, params)
 		if os.path.isdir(params):
+			print("[DEBUG] Sourcing params at: %s" % params)
 			self.interface.load_parameters(params.encode())
 			self.classes = []
 			with open (os.path.join(params, "classes.txt")) as f:
@@ -217,7 +227,7 @@ class CnvClassifier:
 	def classify_cifar(self, path):
 		result = self.bnn.inference(path)
 		self.usecPerImage = self.bnn.usecPerImage
-		return result	
+		return result
 
 	# classify non cifar10 formatted image, result is vector with all rankings of each class
 	def classify_image_details(self, img):
@@ -253,7 +263,7 @@ class CnvClassifier:
 	def classify_cifars(self, path):
 		result = self.bnn.inference_multiple(path)
 		self.usecPerImage = self.bnn.usecPerImage
-		return result	
+		return result
 
 	# multiple detailed inference returns a flatten 1 dimensional vector with each ranking for each class, image by image
 	# .. for regular images
@@ -284,6 +294,7 @@ class LfcClassifier:
 
 	# constructor will load the shared library, download the bitstream to PL and load the specific parameter set into network
 	def __init__(self, network, params, runtime=RUNTIME_HW):
+		print("[DEBUG] starting FC classifier")
 		if params in available_params(network):
 			self.net = network
 			self.params = params

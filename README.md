@@ -1,3 +1,14 @@
+# BNN-PYNQ forked repo for Zybo-Z7
+
+This is an extended version of BNN-PYNQ that includes an extra network topology targetted specially for the Zybo-Z7:
+The topology, named SFC is described in the <a href="https://arxiv.org/abs/1612.07119" target="_blank"> FINN Paper </a>. 
+
+- 1 bit weight and 1 bit activation (W1A1) for SFC
+
+Addittionally, scripts to support synthesis on the Zybo-Z7 and a Google Collab training notebook are included.
+
+Please note that no other included topology is compatible with the Zybo-Z7.
+
 # BNN-PYNQ PIP INSTALL Package
 
 This repo contains the pip install package for Quantized Neural Network (QNN) on PYNQ. 

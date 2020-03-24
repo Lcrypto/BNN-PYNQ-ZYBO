@@ -52,7 +52,7 @@ This will install the BNN package to your board, and create a **bnn** directory 
 
 The repo is organized as follows:
 
--	bnn: contains the LfcClassifier and CnvClassifier python class description
+-	bnn: contains the LfcClassifier/SfcClassifier and CnvClassifier python class description
 	-	src: contains the sources of the different precision networks, the libraries to rebuild them, and scripts to train and pack the weights:
 		- library: FINN library for HLS QNN descriptions, host code, script to rebuilt and drivers for the PYNQ and Ultra96 (please refer to README for more details)
 		- network: HLS top functions for QNN topologies (CNV and LFC) with different implementations for weight and activation precision, host code and make script for HW and SW build (please refer to README for more details)

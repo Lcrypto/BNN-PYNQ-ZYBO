@@ -1,7 +1,7 @@
 # BNN-PYNQ forked repo for Zybo-Z7
 
 This is an extended version of BNN-PYNQ that includes an extra network topology targetted specially for the Zybo-Z7-10:
-The topology, named SFC is described in the <a href="https://arxiv.org/abs/1612.07119" target="_blank"> FINN Paper </a>. 
+The topology, named SFC is described in the <a href="https://arxiv.org/abs/1612.07119" target="_blank"> FINN Paper </a>. The provided implementation has the following characteristics:
 
 - 1 bit weight and 1 bit activation (W1A1) for SFC
 
@@ -74,17 +74,17 @@ The repo is organized as follows:
 
 ## Hardware design rebuilt
 
-In order to rebuild the hardware designs, the repo should be cloned in a machine with installation of the Vivado Design Suite (tested with 2018.2). 
+In order to rebuild the hardware designs, the repo should be cloned in a machine with installation of the Vivado Design Suite (tested with 2018.3). 
 Following the step-by-step instructions:
 
-1.	Clone the repository on your linux machine: `git clone https://github.com/Xilinx/BNN-PYNQ.git --recursive`;
-2.	Move to `<clone_path>/BNN_PYNQ/bnn/src/network/`
-3.	Set the XILINX_BNN_ROOT environment variable to `<clone_path>/BNN_PYNQ/bnn/src/`
+1.	Clone the repository on your linux machine: `git clone https://github.com/fcaspe/BNN-PYNQ-ZYBO.git --recursive`;
+2.	Move to `<clone_path>/BNN_PYNQ-ZYBO/bnn/src/network/`
+3.	Set the XILINX_BNN_ROOT environment variable to `<clone_path>/BNN_PYNQ-ZYBO/bnn/src/`
 4.	Launch the shell script make-hw.sh with passing parameters for target network, target platform and mode, with the command `./make-hw.sh {network} {platform} {mode}` where:
-	- network can be cnvW1A1, cnvW1A2, cnvW2A2 or lfcW1A1, lfcW1A2;
-	- platform can be pynqZ1-Z2 or ultra96;
+	- network can be cnvW1A1, cnvW1A2, cnvW2A2 or lfcW1A1, lfcW1A2, sfcW1A1;
+	- platform can be pynqZ1-Z2, ultra96 or Zybo-Z7;
 	- mode can be `h` to launch Vivado HLS synthesis, `b` to launch the Vivado project (needs HLS synthesis results), `a` to launch both;
-5.	The results will be visible in `clone_path/BNN_PYNQ/bnn/src/network/output/` that is organized as follows:
+5.	The results will be visible in `clone_path/BNN_PYNQ-ZYBO/bnn/src/network/output/` that is organized as follows:
 	- bitstream: contains the generated bitstream(s);
 	- hls-syn: contains the Vivado HLS generated RTL and IP (in the subfolder named as the target network and target platform);
 	- report: contains the Vivado and Vivado HLS reports;

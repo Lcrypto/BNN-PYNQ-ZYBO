@@ -106,7 +106,7 @@ if __name__ == "__main__":
     print("LR_decay = "+str(LR_decay))
     # BTW, LR decay might good for the BN moving average...
     
-    save_path = "hcnv_theano_cifar10-%dw-%da.npz" % (learning_parameters.weight_bits, learning_parameters.activation_bits)
+    save_path = "hcnv_weights_cifar10-%dw-%da.npz" % (learning_parameters.weight_bits, learning_parameters.activation_bits)
     print("save_path = "+str(save_path))
     
     train_set_size = 45000

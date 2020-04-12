@@ -1,0 +1,9 @@
+Epoch 1000 of 1000 took 23.8294289112s
+  LR:                            3.02775865823e-07
+  training loss:                 0.061444220121505196
+  validation loss:               0.02576634484393338
+  validation error rate:         3.599999999999996%
+  best epoch:                    965
+  best validation error rate:    3.4399999999999973%
+  test loss:                     0.02810769454178308
+  test error rate:               3.9099999999999966%

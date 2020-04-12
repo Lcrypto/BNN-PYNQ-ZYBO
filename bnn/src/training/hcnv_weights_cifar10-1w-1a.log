@@ -1,0 +1,9 @@
+Epoch 248 of 500 took 97.1757938862s
+  LR:                            1.8184354942e-05
+  training loss:                 0.20553005905250163
+  validation loss:               0.20471712803283765
+  validation error rate:         37.18000000000001%
+  best epoch:                    248
+  best validation error rate:    37.18000000000001%
+  test loss:                     0.21122478723192994
+  test error rate:               38.82000000000001%

@@ -1,9 +1,14 @@
 # BNN-PYNQ forked repo for Zybo-Z7
 
-This is an extended version of BNN-PYNQ that includes an extra network topology targetted specially for the Zybo-Z7-10:
-The topology, named SFC is described in the <a href="https://arxiv.org/abs/1612.07119" target="_blank"> FINN Paper </a>. The provided implementation has the following characteristics:
+This is an extended version of BNN-PYNQ that includes a network topologies targetted specially for the small Zybo-Z7-10.
+The first topology, named SFC is described in the <a href="https://arxiv.org/abs/1612.07119" target="_blank"> FINN Paper </a>. 
+
+The second topology is a very small CNN, inspired also from the FINN Paper, called HCNV. ( H for Humble :D )
+
+The provided implementations have the following characteristics:
 
 - 1 bit weight and 1 bit activation (W1A1) for SFC
+- 1 bit weight and 1 bit activation (W1A1) for HCNV
 
 Addittionally, scripts to support synthesis on the Zybo-Z7-10 and a Google Collab training notebook are included.
 

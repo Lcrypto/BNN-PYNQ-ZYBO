@@ -124,6 +124,10 @@ if [[ ("$MODE" == "h") || ("$MODE" == "a")  ]]; then
 	PARAMS="$XILINX_BNN_ROOT/../params/cifar10/$NETWORK"
 	TEST_INPUT="$XILINX_BNN_ROOT/../../tests/Test_image/deer.bin"
 	TEST_RESULT=4
+  elif [[ ("$NETWORK" == "scnv"*) ]]; then
+	PARAMS="$XILINX_BNN_ROOT/../params/cifar10/$NETWORK"
+	TEST_INPUT="$XILINX_BNN_ROOT/../../tests/Test_image/deer.bin"
+	TEST_RESULT=4
   elif [[ ("$NETWORK" == "hcnv"*) ]]; then
 	echo "WARNING: Due low accuracy, this small CNV does not classify correcly this image. True result is 4, but it should output 2. "
     sleep 5

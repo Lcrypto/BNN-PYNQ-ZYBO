@@ -9,15 +9,15 @@
 /**
  * Fully-Connected Layer L0:
  *     MatW =   832 MatH =   256
- *     SIMD =    32  PE  =    16
- *     WMEM =   416 TMEM =    16
- *     #Ops  = 425984   Ext Latency  =   416
+ *     SIMD =    32  PE  =    32
+ *     WMEM =   208 TMEM =     8
+ *     #Ops  = 425984   Ext Latency  =   208
 **/
 
 #define L0_SIMD 32
-#define L0_PE 16
-#define L0_WMEM 416
-#define L0_TMEM 16
+#define L0_PE 32
+#define L0_WMEM 208
+#define L0_TMEM 8
 #define L0_MW 832
 #define L0_MH 256
 #define L0_WPI 1
@@ -28,14 +28,14 @@
 /**
  * Fully-Connected Layer L1:
  *     MatW =   256 MatH =   256
- *     SIMD =     8  PE  =    16
- *     WMEM =   512 TMEM =    16
- *     #Ops  = 131072   Ext Latency  =   512
+ *     SIMD =    16  PE  =    16
+ *     WMEM =   256 TMEM =    16
+ *     #Ops  = 131072   Ext Latency  =   256
 **/
 
-#define L1_SIMD 8
+#define L1_SIMD 16
 #define L1_PE 16
-#define L1_WMEM 512
+#define L1_WMEM 256
 #define L1_TMEM 16
 #define L1_MW 256
 #define L1_MH 256
@@ -47,15 +47,15 @@
 /**
  * Fully-Connected Layer L2:
  *     MatW =   256 MatH =   256
- *     SIMD =    16  PE  =     8
- *     WMEM =   512 TMEM =    32
- *     #Ops  = 131072   Ext Latency  =   512
+ *     SIMD =    16  PE  =    16
+ *     WMEM =   256 TMEM =    16
+ *     #Ops  = 131072   Ext Latency  =   256
 **/
 
 #define L2_SIMD 16
-#define L2_PE 8
-#define L2_WMEM 512
-#define L2_TMEM 32
+#define L2_PE 16
+#define L2_WMEM 256
+#define L2_TMEM 16
 #define L2_MW 256
 #define L2_MH 256
 #define L2_WPI 1
@@ -66,14 +66,14 @@
 /**
  * Fully-Connected Layer L3:
  *     MatW =   256 MatH =    64
- *     SIMD =     4  PE  =     8
- *     WMEM =   512 TMEM =     8
- *     #Ops  = 32768   Ext Latency  =   512
+ *     SIMD =     8  PE  =     8
+ *     WMEM =   256 TMEM =     8
+ *     #Ops  = 32768   Ext Latency  =   256
 **/
 
-#define L3_SIMD 4
+#define L3_SIMD 8
 #define L3_PE 8
-#define L3_WMEM 512
+#define L3_WMEM 256
 #define L3_TMEM 8
 #define L3_MW 256
 #define L3_MH 64

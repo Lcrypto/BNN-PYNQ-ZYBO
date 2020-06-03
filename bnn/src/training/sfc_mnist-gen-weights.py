@@ -14,7 +14,9 @@ if __name__ == "__main__":
     targetDirBin = bnnRoot + "/sfcW1A1"
     targetDirHLS = bnnRoot + "/sfcW1A1/hw"
 
-    simdCounts = [32, 8, 16,  4]
+    #simdCounts = [32, 16, 16, 8]
+    #peCounts   = [32, 16, 16, 8]
+    simdCounts = [32, 8, 16, 4]
     peCounts   = [16, 16, 8, 8]
 
     WeightsPrecisions_integer       = [1, 1, 1, 1]

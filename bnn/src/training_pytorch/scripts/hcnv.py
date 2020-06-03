@@ -1,6 +1,6 @@
-# modified training script cnvw1a1 to support a smaller network
 # added possibility to test a single image (used to test the DEER image of the finn testbench to assess correct weight loading in the network.
 # by Franco Caspe
+
 from __future__ import print_function
 import argparse
 import sys
@@ -8,19 +8,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import random
 from torchvision import datasets, transforms
 from torch.autograd import Variable
 from binarized_modules import *
 import numpy as np
+
+EXPERIMENT = "[VERSION INFO] 17-MAY-2020. hcnv movel, with validation test, scales lr every 40 epochs. Can use with FINN."
+
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Quantized CNV (Cifar10) Example')
-parser.add_argument('--batch-size', type=int, default=64, metavar='N', help='input batch size for training (default: 256)')
-parser.add_argument('--test-batch-size', type=int, default=128, metavar='N', help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=50, metavar='N', help='number of epochs to train (default: 10)')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR', help='learning rate (default: 0.001)')
-parser.add_argument('--momentum', type=float, default=0.5, metavar='M', help='SGD momentum (default: 0.5)')
+parser.add_argument('--batch-size', type=int, default=256, metavar='N', help='input batch size for training (default: 256)')
+parser.add_argument('--test-batch-size', type=int, default=256, metavar='N', help='input batch size for testing (default: 256)')
+parser.add_argument('--epochs', type=int, default=500, metavar='N', help='number of epochs to train (default: 500)')
+parser.add_argument('--lr', type=float, default=0.001, metavar='LR', help='learning rate (default: 0.001)')
+#parser.add_argument('--momentum', type=float, default=0.5, metavar='M', help='SGD momentum (default: 0.5)') #NOT USED
 parser.add_argument('--no-cuda', action='store_true', default=False, help='disables CUDA training')
-parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
+parser.add_argument('--seed', type=int, default=1234, metavar='S', help='random seed (default: 1234)')
 parser.add_argument('--gpus', default=0, help='gpus used for training - e.g 0,1,3')
 parser.add_argument('--log-interval', type=int, default=1000, metavar='N', help='how many batches to wait before logging training status')
 parser.add_argument('--resume', default=False, action='store_true', help='Perform only evaluation on val dataset.')
@@ -162,7 +166,30 @@ def train(epoch):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.data))
 
-def test(save_model=False):
+def validate(save_model=False):
+    model.eval()
+    valid_loss = 0
+    correct = 0
+    global prev_acc
+    with torch.no_grad():
+        for data, target in valid_loader:
+            if args.cuda:
+                data, target = data.cuda(), target.cuda()
+            output = model(data)
+            valid_loss += criterion(output, target).data
+            pred = output.data.max(1, keepdim=True)[1]
+            correct += pred.eq(target.data.view_as(pred)).cpu().sum()
+    valid_loss /= len(valid_loader.dataset)
+    new_acc = 100. * correct.float() / len(valid_loader.dataset)
+    print('Valid set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(valid_loss, correct, len(valid_loader.dataset), new_acc))    
+    if new_acc > prev_acc:
+        # save model
+        if save_model:
+            torch.save(model, save_path)
+            print("Model saved at: ", save_path, "\n")
+        prev_acc = new_acc
+
+def test():
     model.eval()
     test_loss = 0
     correct = 0
@@ -177,32 +204,70 @@ def test(save_model=False):
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
     test_loss /= len(test_loader.dataset)
     new_acc = 100. * correct.float() / len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(test_loss, correct, len(test_loader.dataset), new_acc))    
-    if new_acc > prev_acc:
-        # save model
-        if save_model:
-            torch.save(model, save_path)
-            print("Model saved at: ", save_path, "\n")
-        prev_acc = new_acc
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(test_loss, correct, len(test_loader.dataset), new_acc))
 
 if __name__ == '__main__':
-    torch.manual_seed(args.seed)
-    if args.cuda:
-            torch.cuda.manual_seed(args.seed)
+
+    # Indentify
+    print(EXPERIMENT)
+    SEED = args.seed
+
+    random.seed(SEED)
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+    torch.cuda.manual_seed(SEED)
+    torch.backends.cudnn.deterministic = True
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
-    train_loader = torch.utils.data.DataLoader(datasets.CIFAR10('data', train=True, download=True,
-                   transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                   ])),
-        batch_size=args.batch_size, shuffle=True, **kwargs)
-    test_loader = torch.utils.data.DataLoader(datasets.CIFAR10('data', train=False, transform=transforms.Compose([
-                       transforms.ToTensor(),
-                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                   ])),
-        batch_size=args.test_batch_size, shuffle=False, **kwargs)
 
+    # Load dataset and define transforms.
+    train_data = datasets.CIFAR10(root = 'data', 
+                                  train = True, 
+                                  download = True)
+
+    means = train_data.data.mean(axis = (0,1,2)) / 255
+    stds = train_data.data.std(axis = (0,1,2)) / 255
+
+    train_transforms = transforms.Compose([
+                               transforms.RandomHorizontalFlip(),
+                               transforms.RandomRotation(10),
+                               transforms.RandomCrop(32, padding = 3),
+                               transforms.ToTensor(),
+                               transforms.Normalize(mean = means, 
+                                                    std = stds)
+                           ])
+
+    test_transforms = transforms.Compose([
+                               transforms.ToTensor(),
+                               transforms.Normalize(mean = means, 
+                                                    std = stds)
+                           ])
+
+    train_data = datasets.CIFAR10('data', 
+                                  train = True, 
+                                  download = True, 
+                                  transform = train_transforms)
+
+    test_data = datasets.CIFAR10('data', 
+                                 train = False, 
+                                 download = True, 
+                                 transform = test_transforms)
+
+    n_train_examples = int(len(train_data)*0.9)
+    n_valid_examples = len(train_data) - n_train_examples
+
+    train_data, valid_data = torch.utils.data.random_split(train_data, 
+                                                           [n_train_examples, n_valid_examples])
+                                                    
+    train_loader = torch.utils.data.DataLoader(train_data, 
+                                                 shuffle = True, 
+                                                 batch_size=args.batch_size)
+
+    valid_loader = torch.utils.data.DataLoader(valid_data, 
+                                                 batch_size=args.batch_size)
+
+    test_loader = torch.utils.data.DataLoader(test_data, 
+                                                batch_size=args.test_batch_size)
     model = cnv()
     if args.cuda:
         torch.cuda.set_device(0)
@@ -248,6 +313,13 @@ if __name__ == '__main__':
         optimizer = optim.Adam(model.parameters(), lr=args.lr)  
         for epoch in range(1, args.epochs + 1):
             train(epoch)
-            test(save_model=True)
-            if epoch%40==0:
-                optimizer.param_groups[0]['lr']=optimizer.param_groups[0]['lr']*0.1
+            validate(save_model=True)
+            #Learning rate scaling.
+            if epoch%40==0 and epoch != 0:
+                new_lr = optimizer.param_groups[0]['lr']*0.1
+                print("[INFO] Scaling lr to {}.".format(new_lr))
+                optimizer.param_groups[0]['lr']=new_lr
+
+        #Finished Training. Load the best model and test it.
+        model = torch.load(save_path)        
+        test()

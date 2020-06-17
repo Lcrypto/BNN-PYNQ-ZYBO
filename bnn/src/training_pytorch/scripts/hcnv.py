@@ -1,5 +1,5 @@
 # added possibility to test a single image (used to test the DEER image of the finn testbench to assess correct weight loading in the network.
-# by Franco Caspe
+
 
 from __future__ import print_function
 import argparse
@@ -14,7 +14,7 @@ from torch.autograd import Variable
 from binarized_modules import *
 import numpy as np
 
-EXPERIMENT = "[VERSION INFO] 17-MAY-2020. hcnv movel, with validation test, scales lr every 40 epochs. Can use with FINN."
+EXPERIMENT = "[VERSION INFO] 17-MAY-2020. hcnv model, with validation test, scales lr every 40 epochs. Can use with FINN."
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Quantized CNV (Cifar10) Example')

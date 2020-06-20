@@ -35,28 +35,29 @@ from finnthesizer import *
 if __name__ == "__main__":
     bnnRoot = "."
     #npzFile = bnnRoot + "/hcnv_weights_cifar10-w1a1.npz"
-    npzFile = bnnRoot + "/models/hcnv_cifar10-w1a1.npz"
-    targetDirBin = bnnRoot + "/hcnvW1A1"
-    targetDirHLS = bnnRoot + "/hcnvW1A1/hw"
+    npzFile = bnnRoot + "/models/pcnv_cifar10-w1a1.npz"
+    targetDirBin = bnnRoot + "/pcnvW1A1"
+    targetDirHLS = bnnRoot + "/pcnvW1A1/hw"
 
     #topology of convolutional layers (only for config.h defines)
-    ifm       = [32,  14,  5 ]
-    ofm       = [28,  10,  1 ]   
-    ifm_ch    = [ 3,  16, 32 ]
-    ofm_ch    = [16,  32, 64 ]   
-    filterDim = [ 5,   5,  5 ]
+    
+    ifm       = [34,  18, 10 ] #Add +2 to ofm because we are dealing with padded inputs. Change declaration from L0_IFM_DIM to Lx_IFM_DIM_PAD.
+    ofm       = [32,  16,  8 ]
+    ifm_ch    = [ 3,  8,  16 ]
+    ofm_ch    = [ 8,  16, 32 ]   
+    filterDim = [ 3,   3,  3 ]
 
-    WeightsPrecisions_fractional =    [0 , 0 , 0 , 0, 0,  0]
-    ActivationPrecisions_fractional = [0 , 0 , 0 , 0, 0,  0]
-    InputPrecisions_fractional =      [7 , 0 , 0 , 0, 0,  0]
-    WeightsPrecisions_integer =       [1 , 1 , 1 , 1, 1,  1]
-    ActivationPrecisions_integer =    [1 , 1 , 1 , 1, 1, 16]
-    InputPrecisions_integer =         [1 , 1 , 1 , 1, 1,  1]
+    WeightsPrecisions_fractional =    [0 , 0 , 0 , 0]
+    ActivationPrecisions_fractional = [0 , 0 , 0 , 0]
+    InputPrecisions_fractional =      [7 , 0 , 0 , 0]
+    WeightsPrecisions_integer =       [1 , 1 , 1 , 1]
+    ActivationPrecisions_integer =    [1 , 1 , 1 , 16]
+    InputPrecisions_integer =         [1 , 1 , 1 , 1]
 
     classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
-    peCounts =    [ 8, 8, 2, 1, 2, 4]
-    simdCounts =  [ 3, 8, 2, 1, 2, 1]
+    peCounts =    [ 8, 8, 2, 4]
+    simdCounts =  [ 3, 8, 2, 1]
 
     if not os.path.exists(targetDirBin):
         os.mkdir(targetDirBin)
@@ -116,7 +117,7 @@ if __name__ == "__main__":
         m.createBinFiles(targetDirBin, str(convl))
 
     # process fully-connected layers
-    for fcl in range(3,6):
+    for fcl in range(3,4):
         peCount = peCounts[fcl]
         simdCount = simdCounts[fcl]
         WPrecision_fractional = WeightsPrecisions_fractional[fcl]
@@ -126,7 +127,7 @@ if __name__ == "__main__":
         APrecision_integer = ActivationPrecisions_integer[fcl]
         IPrecision_integer = InputPrecisions_integer[fcl]
         print("Using peCount = %d simdCount = %d for engine %d" % (peCount, simdCount, fcl))
-        if fcl == 5: #Last layer
+        if fcl == 3:
             (w,t) = rHW.readFCBNComplex_no_thresholds(WPrecision_fractional, APrecision_fractional, IPrecision_fractional, \
                 WPrecision_integer, APrecision_integer, IPrecision_integer)
             paddedH = padTo(w.shape[0], 64)
